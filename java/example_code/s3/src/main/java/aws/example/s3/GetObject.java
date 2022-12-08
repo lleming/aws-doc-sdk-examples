@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * Get an object within an Amazon S3 bucket.
@@ -59,10 +60,11 @@ public class GetObject {
 
         System.out.format("Downloading %s from S3 bucket %s...\n", key_name, bucket_name);
         final AmazonS3 s3 = AmazonS3ClientBuilder.standard().withRegion(Regions.DEFAULT_REGION).build();
-        try {
+        try (
             S3Object o = s3.getObject(bucket_name, key_name);
             S3ObjectInputStream s3is = o.getObjectContent();
-            FileOutputStream fos = new FileOutputStream(new File(key_name));
+            OutputStream fos = new FileOutputStream(new File(key_name));
+        ) {
             byte[] read_buf = new byte[1024];
             int read_len = 0;
             while ((read_len = s3is.read(read_buf)) > 0) {
